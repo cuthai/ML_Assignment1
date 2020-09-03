@@ -43,3 +43,20 @@ class ETL:
         if self.data_name == 'iris':
             column_names = ['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width', 'Class']
             self.data = pd.read_csv('data\\iris.data', names=column_names)
+
+        if self.data_name == 'soybean':
+            column_names = ['Date', 'Plant_Stand', 'Percip', 'Temp', 'Hail', 'Crop_Hist', 'Area_Damaged', 'Severity',
+                            'Seed_Tmt', 'Germination', 'Plant_Growth', 'Leaves', 'Leaf_Spots_Halo', 'Leaf_Spots_Marg',
+                            'Leaf_Spot_Size', 'Leaf_Shread', 'Leaf_Malf', 'Leaf_Mild', 'Stem', 'Lodging',
+                            'Stem_Cankers', 'Canker_Lesion', 'Fruiting_Bodies', 'External_Decay', 'Mycelium',
+                            'Int_Discolor', 'Sclerotia', 'Fruit_Pods', 'Fruit_Spots', 'Seed', 'Mold_Growth',
+                            'Seed_Discolor', 'Seed_Size', 'Shriveling', 'Roots', 'Class']
+            self.data = pd.read_csv('data\\soybean-small.data', names=column_names)
+
+        if self.data_name == 'vote':
+            column_names = ['Class', 'Handicapped_Infants', 'Water_Project_Cost_Sharing', 'Adoption_Budget_Resolution',
+                            'Physician_Fee_Freeze', 'El_Salvador_Aid', 'Religious_Groups_School',
+                            'Anti_Satellite_Test_Ban', 'Aid_Nicaraguan_Contras', 'MX_Missile', 'Immigration',
+                            'Synfuels_Corporation_Cutback', 'Education_Spending', 'Superfund_Right_To_Sue', 'Crime',
+                            'Duty_Free_Exports', 'Export_Administration_Act_South_Africa']
+            self.data = pd.read_csv('data\\house-votes-84.data', names=column_names)
