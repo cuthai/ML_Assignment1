@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 class ETL:
@@ -8,7 +9,7 @@ class ETL:
     This class really only does the extract and transform functions of ETL. The data is then received downstream by the
     classifier algorithms for processing.
     """
-    def __init__(self, data_name):
+    def __init__(self, data_name, random_state=1):
         """
         Init function. Takes a data_name and extracts the data and then transforms.
 
@@ -23,10 +24,20 @@ class ETL:
         """
         # Set the starting attributes and data_name
         self.data = None
+        self.data_split = []
         self.data_name = data_name
+        self.random_state = random_state
 
         # Extract
         self.extract()
+
+        # Data Split
+        # Since the soybean data is only size 47, it doesnt make sense to do a full CV split. It will only do a single
+        # Train/Test split. All other data will do a 5 CV split.
+        if self.data_name == 'soybean':
+            self.train_test_split()
+        else:
+            self.cv_split()
 
     def extract(self):
         if self.data_name == 'breast-cancer':
@@ -60,3 +71,27 @@ class ETL:
                             'Synfuels_Corporation_Cutback', 'Education_Spending', 'Superfund_Right_To_Sue', 'Crime',
                             'Duty_Free_Exports', 'Export_Administration_Act_South_Africa']
             self.data = pd.read_csv('data\\house-votes-84.data', names=column_names)
+
+    def cv_split(self):
+        data_size = len(self.data)
+
+        if self.random_state:
+            np.random.seed(self.random_state)
+
+        cv_splitter = np.random.choice(a=data_size, size=(5, int(data_size / 5)), replace=False)
+
+        for split in cv_splitter:
+            self.data_split.append(self.data.iloc[split])
+
+    def train_test_split(self):
+        data_size = len(self.data)
+        train_size = int(data_size * 2 / 3)
+
+        if self.random_state:
+            np.random.seed(self.random_state)
+
+        train_splitter = np.random.choice(a=data_size, size=train_size, replace=False)
+        test_splitter = list(set(self.data.index) - set(train_splitter))
+
+        self.data_split.append(self.data.iloc[train_splitter])
+        self.data_split.append(self.data.iloc[test_splitter])
