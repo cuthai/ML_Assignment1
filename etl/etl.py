@@ -39,3 +39,7 @@ class ETL:
             column_names = ['ID', 'Refractive_Index', 'Sodium', 'Magnesium', 'Aluminum', 'Silicon', 'Potassium',
                             'Calcium', 'Barium', 'Iron', 'Class']
             self.data = pd.read_csv('data\\glass.data', names=column_names)
+
+        if self.data_name == 'iris':
+            column_names = ['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width', 'Class']
+            self.data = pd.read_csv('data\\iris.data', names=column_names)

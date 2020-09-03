@@ -1,11 +1,14 @@
 from etl.etl import ETL
+from utils.args import args
 
 
 def main():
-    args = {
-        'data_name': 'glass'
+    arguments = args()
+
+    kwargs = {
+        'data_name': arguments.data_name
     }
-    etl = ETL(**args)
+    etl = ETL(**kwargs)
 
     pass
 
