@@ -127,6 +127,8 @@ class ETL:
                                                    'Export_Administration_Act_South_Africa', 'Class'])
         temp_df.reset_index(inplace=True, drop=True)
 
+        temp_df.drop(columns='Class_democrat', inplace=True)
+
         self.classes = 2
         self.transformed_data = temp_df
 
