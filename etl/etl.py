@@ -24,20 +24,19 @@ class ETL:
         """
         # Set the starting attributes and data_name
         self.data = None
-        self.data_split = []
+        self.transformed_data = None
+        self.data_split = {}
         self.data_name = data_name
         self.random_state = random_state
 
         # Extract
         self.extract()
 
+        # Transform
+        self.transform()
+
         # Data Split
-        # Since the soybean data is only size 47, it doesnt make sense to do a full CV split. It will only do a single
-        # Train/Test split. All other data will do a 5 CV split.
-        if self.data_name == 'soybean':
-            self.train_test_split()
-        else:
-            self.cv_split()
+        self.train_test_split()
 
     def extract(self):
         if self.data_name == 'breast-cancer':
@@ -72,8 +71,26 @@ class ETL:
                             'Duty_Free_Exports', 'Export_Administration_Act_South_Africa']
             self.data = pd.read_csv('data\\house-votes-84.data', names=column_names)
 
+    def transform(self):
+        if self.data_name == 'breast-cancer':
+            self.transform_breast_cancer()
+
+    def transform_breast_cancer(self):
+        temp_df = pd.DataFrame.copy(self.data)
+        temp_df = temp_df.loc[temp_df['Bare_Nuclei'] != '?']
+        temp_df.drop(columns='ID', inplace=True)
+
+        temp_df = pd.get_dummies(temp_df, columns=['Clump_Thickness', 'Uniformity_Cell_Size', 'Uniformity_Cell_Shape',
+                                                   'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 'Bare_Nuclei',
+                                                   'Bland_Chromatin', 'Normal_Nucleoli', 'Mitoses', 'Class'])
+        temp_df.reset_index(inplace=True, drop=True)
+
+        temp_df.drop(columns='Class_2', inplace=True)
+
+        self.transformed_data = temp_df
+
     def cv_split(self):
-        data_size = len(self.data)
+        data_size = len(self.transformed_data)
 
         if self.random_state:
             np.random.seed(self.random_state)
@@ -81,17 +98,23 @@ class ETL:
         cv_splitter = np.random.choice(a=data_size, size=(5, int(data_size / 5)), replace=False)
 
         for split in cv_splitter:
-            self.data_split.append(self.data.iloc[split])
+            self.data_split.append(self.transformed_data.iloc[split])
 
     def train_test_split(self):
-        data_size = len(self.data)
-        train_size = int(data_size * 2 / 3)
+        data_size = len(self.transformed_data)
+        tune_size = int(data_size / 10)
+        train_size = int(data_size * (6 / 10))
 
         if self.random_state:
             np.random.seed(self.random_state)
 
         train_splitter = np.random.choice(a=data_size, size=train_size, replace=False)
-        test_splitter = list(set(self.data.index) - set(train_splitter))
+        remainder = list(set(self.transformed_data.index) - set(train_splitter))
+        tune_splitter = np.random.choice(a=remainder, size=tune_size, replace=False)
+        test_splitter = list(set(remainder) - set(tune_splitter))
 
-        self.data_split.append(self.data.iloc[train_splitter])
-        self.data_split.append(self.data.iloc[test_splitter])
+        self.data_split.update({
+            'train': self.transformed_data.iloc[train_splitter],
+            'tune': self.transformed_data.iloc[tune_splitter],
+            'test': self.transformed_data.iloc[test_splitter]
+        })

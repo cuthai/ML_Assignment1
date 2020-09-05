@@ -1,5 +1,6 @@
-from etl.etl import ETL
 from utils.args import args
+from etl.etl import ETL
+from winnow2.winnow2 import Winnow2
 
 
 def main():
@@ -10,7 +11,7 @@ def main():
     }
     etl = ETL(**kwargs)
 
-    pass
+    Winnow2(etl)
 
 
 if __name__ == '__main__':
