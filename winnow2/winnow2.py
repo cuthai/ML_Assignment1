@@ -12,7 +12,12 @@ class Winnow2:
         self.alpha = alpha
         self.weights = None
 
+        self.train_classification_coefficient_list = None
+        self.train_prediction_list = None
         self.train_accuracy = None
+
+        self.test_classification_coefficient_list = None
+        self.test_prediction_list = None
         self.test_accuracy = None
 
     def fit(self, data_set='train', theta=None, alpha=None):
@@ -29,16 +34,19 @@ class Winnow2:
         true_positive = 0
         true_negative = 0
 
+        classification_coefficient_list = []
+        prediction_list = []
+
         for row_index, row in x.iterrows():
             weights_to_change = []
-            classification = 0
+            classification_coefficient = 0
 
             for column_index in range(len(row)):
-                classification += row[column_index] * self.weights[column_index]
+                classification_coefficient += row[column_index] * self.weights[column_index]
                 if row[column_index] == 1:
                     weights_to_change.append(column_index)
 
-            if classification > theta:
+            if classification_coefficient > theta:
                 prediction = 1
 
                 if prediction != y[row_index]:
@@ -56,7 +64,17 @@ class Winnow2:
                 else:
                     true_negative += 1
 
-        return (true_positive + true_negative) / len(x)
+            classification_coefficient_list.append(classification_coefficient)
+            prediction_list.append(prediction)
+
+        accuracy = (true_positive + true_negative) / len(x)
+
+        if data_set == 'train':
+            self.train_classification_coefficient_list = classification_coefficient_list
+            self.train_prediction_list = prediction_list
+            self.train_accuracy = accuracy
+
+        return accuracy
 
     def demotion(self, weights_to_change, alpha):
         for weight in weights_to_change:
@@ -93,15 +111,16 @@ class Winnow2:
         true_positive = 0
         true_negative = 0
 
-        predictions = []
+        classification_coefficient_list = []
+        prediction_list = []
 
         for row_index, row in x.iterrows():
-            classification = 0
+            classification_coefficient = 0
 
             for column_index in range(len(row)):
-                classification += row[column_index] * self.weights[column_index]
+                classification_coefficient += row[column_index] * self.weights[column_index]
 
-            if classification > self.theta:
+            if classification_coefficient > self.theta:
                 prediction = 1
 
                 if prediction == y[row_index]:
@@ -113,6 +132,13 @@ class Winnow2:
                 if prediction == y[row_index]:
                     true_negative += 1
 
-            predictions.append(prediction)
+            classification_coefficient_list.append(classification_coefficient)
+            prediction_list.append(prediction)
 
-        return (true_positive + true_negative) / len(x)
+        accuracy = (true_positive + true_negative) / len(x)
+
+        self.test_classification_coefficient_list = classification_coefficient_list
+        self.test_prediction_list = prediction_list
+        self.test_accuracy = accuracy
+
+        return accuracy

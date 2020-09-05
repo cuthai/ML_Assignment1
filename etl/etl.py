@@ -28,15 +28,13 @@ class ETL:
         self.data_split = {}
         self.data_name = data_name
         self.random_state = random_state
+        self.classes = 0
 
         # Extract
         self.extract()
 
         # Transform
         self.transform()
-
-        # Data Split
-        self.train_test_split()
 
     def extract(self):
         if self.data_name == 'breast-cancer':
@@ -75,6 +73,9 @@ class ETL:
         if self.data_name == 'breast-cancer':
             self.transform_breast_cancer()
 
+        elif self.data_name == 'glass':
+            self.transform_glass()
+
     def transform_breast_cancer(self):
         temp_df = pd.DataFrame.copy(self.data)
         temp_df = temp_df.loc[temp_df['Bare_Nuclei'] != '?']
@@ -87,6 +88,22 @@ class ETL:
 
         temp_df.drop(columns='Class_2', inplace=True)
 
+        self.classes = 2
+        self.transformed_data = temp_df
+
+    def transform_glass(self):
+        temp_df = pd.DataFrame.copy(self.data)
+        temp_df.drop(columns='ID', inplace=True)
+
+        for column in ['Refractive_Index', 'Sodium', 'Magnesium', 'Aluminum', 'Silicon', 'Potassium', 'Calcium',
+                       'Barium', 'Iron']:
+            temp_df[column] = pd.cut(temp_df[column], bins=10)
+
+        temp_df = pd.get_dummies(temp_df, columns=['Refractive_Index', 'Sodium', 'Magnesium', 'Aluminum',
+                                                   'Silicon', 'Potassium', 'Calcium', 'Barium', 'Iron', 'Class'])
+        temp_df.reset_index(inplace=True, drop=True)
+
+        self.classes = 6
         self.transformed_data = temp_df
 
     def cv_split(self):
