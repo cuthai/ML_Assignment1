@@ -15,26 +15,6 @@ class Winnow2:
         self.train_accuracy = None
         self.test_accuracy = None
 
-        self.tune()
-
-    def tune(self):
-        theta_list = np.linspace(.5, 10, 20)
-        alpha_list = np.linspace(2, 6, 5)
-
-        max_accuracy = 0
-        optimal_theta = .5
-        optimal_alpha = 2
-
-        for theta in theta_list:
-            for alpha in alpha_list:
-                accuracy = self.fit(data_set='tune', theta=theta, alpha=alpha)
-                if accuracy > max_accuracy:
-                    max_accuracy = accuracy
-                    optimal_theta = theta
-                    optimal_alpha = alpha
-
-        pass
-
     def fit(self, data_set='train', theta=None, alpha=None):
         if not theta:
             theta = self.theta
@@ -85,3 +65,54 @@ class Winnow2:
     def promotion(self, weights_to_change, alpha):
         for weight in weights_to_change:
             self.weights[weight] = self.weights[weight] * alpha
+
+    def tune(self):
+        theta_list = np.linspace(.5, 10, 20)
+        alpha_list = np.linspace(2, 6, 5)
+
+        max_accuracy = 0
+        optimal_theta = .5
+        optimal_alpha = 2
+
+        for theta in theta_list:
+            for alpha in alpha_list:
+                accuracy = self.fit(data_set='tune', theta=theta, alpha=alpha)
+                if accuracy > max_accuracy:
+                    max_accuracy = accuracy
+                    optimal_theta = theta
+                    optimal_alpha = alpha
+
+        self.theta = optimal_theta
+        self.alpha = optimal_alpha
+
+    def predict(self):
+        data = self.data_split['test']
+        x = data.iloc[:, :-1]
+        y = data.iloc[:, -1]
+
+        true_positive = 0
+        true_negative = 0
+
+        predictions = []
+
+        for row_index, row in x.iterrows():
+            classification = 0
+
+            for column_index in range(len(row)):
+                classification += row[column_index] * self.weights[column_index]
+
+            if classification > self.theta:
+                prediction = 1
+
+                if prediction == y[row_index]:
+                    true_positive += 1
+
+            else:
+                prediction = 0
+
+                if prediction == y[row_index]:
+                    true_negative += 1
+
+            predictions.append(prediction)
+
+        return (true_positive + true_negative) / len(x)

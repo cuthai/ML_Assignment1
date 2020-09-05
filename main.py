@@ -11,7 +11,13 @@ def main():
     }
     etl = ETL(**kwargs)
 
-    Winnow2(etl)
+    winnow_model = Winnow2(etl)
+
+    winnow_model.tune()
+
+    print(winnow_model.fit())
+
+    print(winnow_model.predict())
 
 
 if __name__ == '__main__':
