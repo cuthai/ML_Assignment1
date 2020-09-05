@@ -43,16 +43,16 @@ class ETL:
                             'Normal_Nucleoli', 'Mitoses', 'Class']
             self.data = pd.read_csv('data\\breast-cancer-wisconsin.data', names=column_names)
 
-        if self.data_name == 'glass':
+        elif self.data_name == 'glass':
             column_names = ['ID', 'Refractive_Index', 'Sodium', 'Magnesium', 'Aluminum', 'Silicon', 'Potassium',
                             'Calcium', 'Barium', 'Iron', 'Class']
             self.data = pd.read_csv('data\\glass.data', names=column_names)
 
-        if self.data_name == 'iris':
+        elif self.data_name == 'iris':
             column_names = ['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width', 'Class']
             self.data = pd.read_csv('data\\iris.data', names=column_names)
 
-        if self.data_name == 'soybean':
+        elif self.data_name == 'soybean':
             column_names = ['Date', 'Plant_Stand', 'Percip', 'Temp', 'Hail', 'Crop_Hist', 'Area_Damaged', 'Severity',
                             'Seed_Tmt', 'Germination', 'Plant_Growth', 'Leaves', 'Leaf_Spots_Halo', 'Leaf_Spots_Marg',
                             'Leaf_Spot_Size', 'Leaf_Shread', 'Leaf_Malf', 'Leaf_Mild', 'Stem', 'Lodging',
@@ -61,7 +61,7 @@ class ETL:
                             'Seed_Discolor', 'Seed_Size', 'Shriveling', 'Roots', 'Class']
             self.data = pd.read_csv('data\\soybean-small.data', names=column_names)
 
-        if self.data_name == 'vote':
+        elif self.data_name == 'vote':
             column_names = ['Class', 'Handicapped_Infants', 'Water_Project_Cost_Sharing', 'Adoption_Budget_Resolution',
                             'Physician_Fee_Freeze', 'El_Salvador_Aid', 'Religious_Groups_School',
                             'Anti_Satellite_Test_Ban', 'Aid_Nicaraguan_Contras', 'MX_Missile', 'Immigration',
@@ -69,12 +69,21 @@ class ETL:
                             'Duty_Free_Exports', 'Export_Administration_Act_South_Africa']
             self.data = pd.read_csv('data\\house-votes-84.data', names=column_names)
 
+        else:
+            raise NameError('Please specify a predefined name for one of the 5 data sets')
+
     def transform(self):
         if self.data_name == 'breast-cancer':
             self.transform_breast_cancer()
 
         elif self.data_name == 'glass':
             self.transform_glass()
+
+        elif self.data_name == 'vote':
+            self.transform_vote()
+
+        else:
+            raise NameError('Please specify a predefined name for one of the 5 data sets')
 
     def transform_breast_cancer(self):
         temp_df = pd.DataFrame.copy(self.data)
@@ -104,6 +113,21 @@ class ETL:
         temp_df.reset_index(inplace=True, drop=True)
 
         self.classes = 6
+        self.transformed_data = temp_df
+
+    def transform_vote(self):
+        temp_df = pd.DataFrame.copy(self.data)
+
+        temp_df = pd.get_dummies(temp_df, columns=['Handicapped_Infants', 'Water_Project_Cost_Sharing',
+                                                   'Adoption_Budget_Resolution', 'Physician_Fee_Freeze',
+                                                   'El_Salvador_Aid', 'Religious_Groups_School',
+                                                   'Anti_Satellite_Test_Ban', 'Aid_Nicaraguan_Contras', 'MX_Missile',
+                                                   'Immigration', 'Synfuels_Corporation_Cutback', 'Education_Spending',
+                                                   'Superfund_Right_To_Sue', 'Crime', 'Duty_Free_Exports',
+                                                   'Export_Administration_Act_South_Africa', 'Class'])
+        temp_df.reset_index(inplace=True, drop=True)
+
+        self.classes = 2
         self.transformed_data = temp_df
 
     def cv_split(self):

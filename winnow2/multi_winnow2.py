@@ -1,5 +1,4 @@
 import copy
-import pandas as pd
 from winnow2.winnow2 import Winnow2
 
 
