@@ -79,6 +79,9 @@ class ETL:
         elif self.data_name == 'glass':
             self.transform_glass()
 
+        elif self.data_name == 'iris':
+            self.transform_iris()
+
         elif self.data_name == 'vote':
             self.transform_vote()
 
@@ -113,6 +116,19 @@ class ETL:
         temp_df.reset_index(inplace=True, drop=True)
 
         self.classes = 6
+        self.transformed_data = temp_df
+
+    def transform_iris(self):
+        temp_df = pd.DataFrame.copy(self.data)
+
+        for column in ['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width']:
+            temp_df[column] = pd.cut(temp_df[column], bins=10)
+
+        temp_df = pd.get_dummies(temp_df, columns=['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width',
+                                                   'Class'])
+        temp_df.reset_index(inplace=True, drop=True)
+
+        self.classes = 3
         self.transformed_data = temp_df
 
     def transform_vote(self):
