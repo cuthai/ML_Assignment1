@@ -82,6 +82,9 @@ class ETL:
         elif self.data_name == 'iris':
             self.transform_iris()
 
+        elif self.data_name == 'soybean':
+            self.transform_soybean()
+
         elif self.data_name == 'vote':
             self.transform_vote()
 
@@ -131,6 +134,22 @@ class ETL:
         self.classes = 3
         self.transformed_data = temp_df
 
+    def transform_soybean(self):
+        temp_df = pd.DataFrame.copy(self.data)
+
+        temp_df = pd.get_dummies(temp_df, columns=['Date', 'Plant_Stand', 'Percip', 'Temp', 'Hail', 'Crop_Hist',
+                                                   'Area_Damaged', 'Severity', 'Seed_Tmt', 'Germination',
+                                                   'Plant_Growth', 'Leaves', 'Leaf_Spots_Halo', 'Leaf_Spots_Marg',
+                                                   'Leaf_Spot_Size', 'Leaf_Shread', 'Leaf_Malf', 'Leaf_Mild', 'Stem',
+                                                   'Lodging', 'Stem_Cankers', 'Canker_Lesion', 'Fruiting_Bodies',
+                                                   'External_Decay', 'Mycelium', 'Int_Discolor', 'Sclerotia',
+                                                   'Fruit_Pods', 'Fruit_Spots', 'Seed', 'Mold_Growth', 'Seed_Discolor',
+                                                   'Seed_Size', 'Shriveling', 'Roots', 'Class'])
+        temp_df.reset_index(inplace=True, drop=True)
+
+        self.classes = 4
+        self.transformed_data = temp_df
+
     def transform_vote(self):
         temp_df = pd.DataFrame.copy(self.data)
 
@@ -171,6 +190,10 @@ class ETL:
         remainder = list(set(self.transformed_data.index) - set(train_splitter))
         tune_splitter = np.random.choice(a=remainder, size=tune_size, replace=False)
         test_splitter = list(set(remainder) - set(tune_splitter))
+
+        if self.data_name == 'soybean':
+            train_splitter = np.concatenate([train_splitter, tune_splitter])
+            tune_splitter = train_splitter
 
         self.data_split.update({
             'train': self.transformed_data.iloc[train_splitter],
