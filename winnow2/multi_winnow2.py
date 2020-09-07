@@ -34,11 +34,11 @@ class MultiWinnow2:
             temp_y = temp_etl.transformed_data.iloc[:, -index]
 
             temp_x[temp_y_name] = temp_y
-            temp_etl.update_data_name(temp_y_name)
 
             temp_etl.transformed_data = temp_x
 
             temp_etl.train_test_split()
+            temp_etl.update_data_name(temp_y_name)
 
             self.etl_list.update({temp_y_name: temp_etl})
 
