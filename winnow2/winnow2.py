@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class Winnow2:
@@ -24,6 +25,9 @@ class Winnow2:
         self.test_prediction_list = None
         self.test_accuracy = None
 
+        self.test_results = None
+        self.train_results = None
+
     def fit(self, data_set='train', theta=None, alpha=None):
         if not theta:
             theta = self.theta
@@ -33,6 +37,7 @@ class Winnow2:
         data = self.data_split[data_set]
         x = data.iloc[:, :-1]
         y = data.iloc[:, -1]
+        y_name = data.keys()[-1]
         self.weights = [1] * len(x.keys())
 
         true_positive = 0
@@ -78,6 +83,10 @@ class Winnow2:
             self.train_prediction_list = prediction_list
             self.train_accuracy = accuracy
 
+            train_result_df = pd.DataFrame(self.data, index=data.index)
+            train_result_df[y_name] = prediction_list
+            self.train_results = train_result_df
+
         return classification_coefficient_list, prediction_list, accuracy
 
     def demotion(self, weights_to_change, alpha):
@@ -114,6 +123,7 @@ class Winnow2:
         data = self.data_split['test']
         x = data.iloc[:, :-1]
         y = data.iloc[:, -1]
+        y_name = data.keys()[-1]
 
         true_positive = 0
         true_negative = 0
@@ -148,6 +158,10 @@ class Winnow2:
         self.test_prediction_list = prediction_list
         self.test_accuracy = accuracy
 
+        test_result_df = pd.DataFrame(self.data, index=data.index)
+        test_result_df[y_name] = prediction_list
+        self.test_results = test_result_df
+
         return classification_coefficient_list, prediction_list, accuracy
 
     def visualize_tune(self):
@@ -167,3 +181,7 @@ class Winnow2:
         ax.tick_params(axis='y', which='minor', bottom=False)
 
         plt.savefig(f'output\\{self.data_name}_tune.jpg')
+
+    def save_results(self):
+        self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
+        self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')

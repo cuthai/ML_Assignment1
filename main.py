@@ -24,10 +24,18 @@ def main():
         test_results = winnow_model.predict()
         print(test_results[2])
 
-    else:
-        winnow_model = MultiWinnow2(etl)
+        winnow_model.save_results()
 
-    pass
+    else:
+        multi_winnow_model = MultiWinnow2(etl)
+
+        multi_winnow_model.split_etl()
+
+        multi_winnow_model.individual_class_winnow2()
+
+        multi_winnow_model.multi_class_winnow2()
+
+        multi_winnow_model.save_results()
 
 
 if __name__ == '__main__':

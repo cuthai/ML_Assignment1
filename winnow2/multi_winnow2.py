@@ -7,6 +7,7 @@ import numpy as np
 class MultiWinnow2:
     def __init__(self, etl):
         self.base_etl = etl
+        self.data_name = self.base_etl.data_name
         self.base_etl.train_test_split()
         self.classes = self.base_etl.classes
 
@@ -18,10 +19,6 @@ class MultiWinnow2:
 
         self.test_results = None
         self.train_results = None
-
-        self.split_etl()
-        self.individual_class_winnow2()
-        self.multi_class_winnow2()
 
     def split_etl(self):
         class_list = list(range(1, self.classes + 1))
@@ -77,3 +74,7 @@ class MultiWinnow2:
         self.test_results = pd.DataFrame.copy(self.base_etl.data.iloc[self.base_etl.data_split['test'].index],
                                               deep=True)
         self.test_results['Prediction'] = test_result_df
+
+    def save_results(self):
+        self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
+        self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')
