@@ -74,7 +74,7 @@ class Winnow2:
             self.train_prediction_list = prediction_list
             self.train_accuracy = accuracy
 
-        return accuracy
+        return classification_coefficient_list, prediction_list, accuracy
 
     def demotion(self, weights_to_change, alpha):
         for weight in weights_to_change:
@@ -94,7 +94,7 @@ class Winnow2:
 
         for theta in theta_list:
             for alpha in alpha_list:
-                accuracy = self.fit(data_set='tune', theta=theta, alpha=alpha)
+                accuracy = self.fit(data_set='tune', theta=theta, alpha=alpha)[2]
                 if accuracy > max_accuracy:
                     max_accuracy = accuracy
                     optimal_theta = theta
@@ -141,4 +141,4 @@ class Winnow2:
         self.test_prediction_list = prediction_list
         self.test_accuracy = accuracy
 
-        return accuracy
+        return classification_coefficient_list, prediction_list, accuracy

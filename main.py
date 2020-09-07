@@ -16,8 +16,12 @@ def main():
 
         winnow_model = Winnow2(etl)
         winnow_model.tune()
-        print(winnow_model.fit())
-        print(winnow_model.predict())
+
+        train_results = winnow_model.fit()
+        print(train_results[2])
+
+        test_results = winnow_model.predict()
+        print(test_results[2])
 
     else:
         winnow_model = MultiWinnow2(etl)
