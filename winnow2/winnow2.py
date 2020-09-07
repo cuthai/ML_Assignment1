@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Winnow2:
@@ -11,6 +12,9 @@ class Winnow2:
         self.theta = theta
         self.alpha = alpha
         self.weights = None
+
+        self.tune_parameter_list = []
+        self.tune_accuracy_list = []
 
         self.train_classification_coefficient_list = None
         self.train_prediction_list = None
@@ -100,6 +104,9 @@ class Winnow2:
                     optimal_theta = theta
                     optimal_alpha = alpha
 
+                self.tune_parameter_list.append(f'{theta}, {alpha}')
+                self.tune_accuracy_list.append(accuracy)
+
         self.theta = optimal_theta
         self.alpha = optimal_alpha
 
@@ -142,3 +149,21 @@ class Winnow2:
         self.test_accuracy = accuracy
 
         return classification_coefficient_list, prediction_list, accuracy
+
+    def visualize_tune(self):
+        fig, ax = plt.subplots()
+
+        ax.plot(self.tune_parameter_list, self.tune_accuracy_list, 'o')
+
+        ax.set_title(rf'{self.data_name} Tune Results - Optimal: $\theta$ {self.theta}, $\alpha$ {self.alpha}')
+
+        ax.set_xlabel(r'Parameters - Major Ticks: $\theta$, Minor Ticks: $\alpha$')
+        ax.set_xlim(5, 100)
+        ax.set_xticks(np.linspace(0, 95, 20))
+        ax.set_xticklabels(np.linspace(.5, 10, 20), rotation=45, fontsize=6)
+        ax.minorticks_on()
+
+        ax.set_ylabel('Accuracy')
+        ax.tick_params(axis='y', which='minor', bottom=False)
+
+        plt.savefig(f'output\\{self.data_name}_tune.jpg')

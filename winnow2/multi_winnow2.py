@@ -23,8 +23,6 @@ class MultiWinnow2:
         self.individual_class_winnow2()
         self.multi_class_winnow2()
 
-        pass
-
     def split_etl(self):
         class_list = list(range(1, self.classes + 1))
         class_list.reverse()
@@ -36,6 +34,7 @@ class MultiWinnow2:
             temp_y = temp_etl.transformed_data.iloc[:, -index]
 
             temp_x[temp_y_name] = temp_y
+            temp_etl.update_data_name(temp_y_name)
 
             temp_etl.transformed_data = temp_x
 
@@ -51,6 +50,7 @@ class MultiWinnow2:
 
             temp_winnow2_model = Winnow2(etl)
             temp_winnow2_model.tune()
+            temp_winnow2_model.visualize_tune()
 
             train_results = temp_winnow2_model.fit()
             self.winnow2_model_list.update({class_name: temp_winnow2_model})

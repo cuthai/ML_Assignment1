@@ -16,6 +16,7 @@ def main():
 
         winnow_model = Winnow2(etl)
         winnow_model.tune()
+        winnow_model.visualize_tune()
 
         train_results = winnow_model.fit()
         print(train_results[2])

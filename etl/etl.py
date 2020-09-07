@@ -167,17 +167,6 @@ class ETL:
         self.classes = 2
         self.transformed_data = temp_df
 
-    def cv_split(self):
-        data_size = len(self.transformed_data)
-
-        if self.random_state:
-            np.random.seed(self.random_state)
-
-        cv_splitter = np.random.choice(a=data_size, size=(5, int(data_size / 5)), replace=False)
-
-        for split in cv_splitter:
-            self.data_split.append(self.transformed_data.iloc[split])
-
     def train_test_split(self):
         data_size = len(self.transformed_data)
         tune_size = int(data_size / 10)
@@ -200,3 +189,6 @@ class ETL:
             'tune': self.transformed_data.iloc[tune_splitter],
             'test': self.transformed_data.iloc[test_splitter]
         })
+
+    def update_data_name(self, class_name):
+        self.data_name = f'{self.data_name}_{class_name}'
