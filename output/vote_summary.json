@@ -1,0 +1,1 @@
+{"name": "vote", "tune": {"theta": 8.5, "alpha": 3.0}, "train": {"accuracy": 0.9003831417624522}, "test": {"accuracy": 0.9312977099236641}}

@@ -2,6 +2,7 @@ import copy
 from winnow2.winnow2 import Winnow2
 import pandas as pd
 import numpy as np
+import json
 
 
 class MultiWinnow2:
@@ -19,6 +20,8 @@ class MultiWinnow2:
 
         self.test_results = None
         self.train_results = None
+
+        self.summary = {}
 
     def split_etl(self):
         class_list = list(range(1, self.classes + 1))
@@ -43,8 +46,6 @@ class MultiWinnow2:
         for class_name in self.etl_list.keys():
             etl = self.etl_list[class_name]
 
-            print(class_name)
-
             temp_winnow2_model = Winnow2(etl)
             temp_winnow2_model.tune()
             temp_winnow2_model.visualize_tune()
@@ -52,11 +53,9 @@ class MultiWinnow2:
             train_results = temp_winnow2_model.fit()
             self.winnow2_model_list.update({class_name: temp_winnow2_model})
             self.train_classification_coefficient_df[class_name] = train_results[0]
-            print(train_results[2])
 
             test_results = temp_winnow2_model.predict()
             self.test_classification_coefficient_df[class_name] = test_results[0]
-            print(test_results[2])
 
     def multi_class_winnow2(self):
         train_order_df = np.argsort(-self.train_classification_coefficient_df.values, axis=1)
@@ -75,6 +74,44 @@ class MultiWinnow2:
                                               deep=True)
         self.test_results['Prediction'] = test_result_df
 
-    def save_results(self):
+        if self.data_name == 'glass':
+            self.train_results['Prediction'] = pd.to_numeric(self.train_results['Prediction'])
+            self.test_results['Prediction'] = pd.to_numeric(self.test_results['Prediction'])
+
+    def create_and_save_summary(self):
+        train_accuracy = len(self.train_results.loc[self.train_results['Class'] == self.train_results['Prediction']]) /\
+                         len(self.train_results)
+        test_accuracy = len(self.test_results.loc[self.test_results['Class'] == self.test_results['Prediction']]) /\
+                        len(self.test_results)
+
+        self.summary.update({
+            'Overall': {
+                'train': train_accuracy,
+                'test': test_accuracy
+            }
+        })
+
+        for winnow2_model in self.winnow2_model_list.values():
+            summary = {
+                winnow2_model.data_name: {
+                    'tune': {
+                        'theta': winnow2_model.theta,
+                        'alpha': winnow2_model.alpha
+                    },
+                    'train': {
+                        'accuracy': winnow2_model.train_accuracy
+                    },
+                    'test': {
+                        'accuracy': winnow2_model.test_accuracy
+                    }
+                }
+            }
+
+            self.summary.update(summary)
+
+        with open(f'output\\{self.data_name}_summary.json', 'w') as file:
+            json.dump(self.summary, file)
+
+    def save_csv_results(self):
         self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
         self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import json
 
 
 class Winnow2:
@@ -27,6 +28,8 @@ class Winnow2:
 
         self.test_results = None
         self.train_results = None
+
+        self.summary = {}
 
     def fit(self, data_set='train', theta=None, alpha=None):
         if not theta:
@@ -182,6 +185,24 @@ class Winnow2:
 
         plt.savefig(f'output\\{self.data_name}_tune.jpg')
 
-    def save_results(self):
+    def create_and_save_summary(self):
+        self.summary = {
+            'name': self.data_name,
+            'tune': {
+                'theta': self.theta,
+                'alpha': self.alpha,
+            },
+            'train': {
+                'accuracy': self.train_accuracy
+            },
+            'test': {
+                'accuracy': self.test_accuracy
+            }
+        }
+
+        with open(f'output\\{self.data_name}_summary.json', 'w') as file:
+            json.dump(self.summary, file)
+
+    def save_csv_results(self):
         self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
         self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')

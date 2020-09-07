@@ -18,13 +18,12 @@ def main():
         winnow_model.tune()
         winnow_model.visualize_tune()
 
-        train_results = winnow_model.fit()
-        print(train_results[2])
+        winnow_model.fit()
 
-        test_results = winnow_model.predict()
-        print(test_results[2])
+        winnow_model.predict()
 
-        winnow_model.save_results()
+        winnow_model.create_and_save_summary()
+        winnow_model.save_csv_results()
 
     else:
         multi_winnow_model = MultiWinnow2(etl)
@@ -35,7 +34,8 @@ def main():
 
         multi_winnow_model.multi_class_winnow2()
 
-        multi_winnow_model.save_results()
+        multi_winnow_model.create_and_save_summary()
+        multi_winnow_model.save_csv_results()
 
 
 if __name__ == '__main__':

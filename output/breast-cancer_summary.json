@@ -1,0 +1,1 @@
+{"name": "breast-cancer", "tune": {"theta": 3.5, "alpha": 4.0}, "train": {"accuracy": 0.9559902200488998}, "test": {"accuracy": 0.9563106796116505}}
