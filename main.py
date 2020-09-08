@@ -8,7 +8,8 @@ def main():
     arguments = args()
 
     kwargs = {
-        'data_name': arguments.data_name
+        'data_name': arguments.data_name,
+        'random_state': arguments.random_state
     }
     etl = ETL(**kwargs)
     if etl.classes == 2:
