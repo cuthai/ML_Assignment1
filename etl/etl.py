@@ -7,7 +7,7 @@ class ETL:
     Class ETL to handle the ETL of the data.
 
     This class really only does the extract and transform functions of ETL. The data is then received downstream by the
-    classifier algorithms for processing.
+        classifier algorithms for processing.
     """
     def __init__(self, data_name, random_state=1):
         """
@@ -121,8 +121,8 @@ class ETL:
         Function to transform breast-cancer data set
 
         For this function any missing data points are removed since there are 16 missing data points which is less than
-        3% of the data. Since the data is somewhat categorical, there was no binning done. The data is dummied based on
-        the 10 values in each column.
+            3% of the data. Since the data is somewhat categorical, there was no binning done. The data is dummied based
+            on the 10 values in each column.
 
         :return self.transformed_data: DataFrame, transformed data set
         :return self.classes: int, num of classes
@@ -156,8 +156,8 @@ class ETL:
         Function to transform glass data set
 
         For this function numeric data is binned into groups of 10, and then dummied, similar to the breast-cancer
-        data set. There are no missing values. Since this is a multi class data set, we'll dummy the classes for now
-        and let the classifier handle the multi classes.
+            data set. There are no missing values. Since this is a multi class data set, we'll dummy the classes for now
+            and let the classifier handle the multi classes.
 
         :return self.transformed_data: DataFrame, transformed data set
         :return self.classes: int, num of classes
@@ -189,8 +189,8 @@ class ETL:
         Function to transform iris data set
 
         For this function numeric data is binned into groups of 10, and then dummied, similar to the breast-cancer
-        data set. There are no missing values. Since this is a multi class data set, we'll dummy the classes for now
-        and let the classifier handle the multi classes.
+            data set. There are no missing values. Since this is a multi class data set, we'll dummy the classes for now
+            and let the classifier handle the multi classes.
 
         :return self.transformed_data: DataFrame, transformed data set
         :return self.classes: int, num of classes
@@ -218,8 +218,8 @@ class ETL:
         Function to transform soybean data set
 
         For this function the data is already binned. Those values are then dummied, similar to the breast-cancer
-        data set. There are no missing values. Since this is a multi class data set, we'll dummy the classes for now
-        and let the classifier handle the multi classes.
+            data set. There are no missing values. Since this is a multi class data set, we'll dummy the classes for now
+            and let the classifier handle the multi classes.
 
         :return self.transformed_data: DataFrame, transformed data set
         :return self.classes: int, num of classes
@@ -248,8 +248,8 @@ class ETL:
         Function to transform vote data set
 
         For this function a question mark is treated as a distinct category, since abstaining from a vote might tell us
-        about the rep's party. Since the data is somewhat categorical, there was no binning done. The data is dummied
-        based on the 3 possible values in each column.
+            about the rep's party. Since the data is somewhat categorical, there was no binning done. The data is
+            dummied based on the 3 possible values in each column.
 
         :return self.transformed_data: DataFrame, transformed data set
         :return self.classes: int, num of classes
@@ -281,8 +281,9 @@ class ETL:
         Function to split our transformed data into 10% tune, 60% train, 30% test
 
         This function randomizes a number and also the order of the 3 resulting data sets. This ensures that our fit
-        is on random ordering as well. The split DataFrames are then added back as a dictionary to the ETL object. For
-        the soybean data set, 10% tune would be only 4 data points so the tune and train are set to 70% vs 30% test.
+            is on random ordering as well. The split DataFrames are then added back as a dictionary to the ETL object.
+            For the soybean data set, 10% tune would be only 4 data points so the tune and train are set to 70% vs 30%
+            test.
 
         :return self.data_split: dict (of DataFrames), dictionary with keys (tune, train, test) referring to the split
             transformed data
