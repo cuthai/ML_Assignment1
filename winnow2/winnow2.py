@@ -343,7 +343,7 @@ class Winnow2:
         :return: csv to output folder
         """
         # Train
-        self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
+        self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')
 
         # Test
-        self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')
+        self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
