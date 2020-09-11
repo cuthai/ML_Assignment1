@@ -27,6 +27,7 @@ class ETL:
         self.data = None
         self.transformed_data = None
         self.data_split = {}
+        self.class_data_split = {}
         self.data_name = data_name
         self.random_state = random_state
         self.classes = 0
@@ -321,6 +322,14 @@ class ETL:
             'tune': self.transformed_data.iloc[tune_splitter],
             'test': self.transformed_data.iloc[test_splitter]
         })
+
+        # Update our attribute with the dictionary defining the train, tune, and test data sets for class column only
+        self.class_data_split.update({
+            'train': self.data['Class'].iloc[train_splitter],
+            'tune': self.data['Class'].iloc[tune_splitter],
+            'test': self.data['Class'].iloc[test_splitter]
+        })
+
 
     def update_data_name(self, class_name):
         """
