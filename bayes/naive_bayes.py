@@ -1,4 +1,6 @@
 import json
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class NaiveBayes:
@@ -20,12 +22,22 @@ class NaiveBayes:
         self.m = m
         self.variable_frequency = {}
 
-    def fit(self, data_split_name='test'):
-        self.construct_frequency_tree(data_split_name)
+        # Tune Results
+        self.tune_parameter_list = []
+        self.tune_accuracy_list = []
 
-        print(self.classify(data_split_name))
+    def fit(self, data_split_name='test', p=None, m=None):
+        # If no parameters grab the object's current theta and alpha
+        if not p:
+            p = self.p
+        if not m:
+            m = self.m
 
-    def construct_frequency_tree(self, data_split_name):
+        self.construct_frequency_tree(data_split_name, p=p, m=m)
+
+        return self.classify(data_split_name)
+
+    def construct_frequency_tree(self, data_split_name, p, m):
         data = self.data_split[data_split_name]
         overall_normalizer = len(data)
 
@@ -40,11 +52,11 @@ class NaiveBayes:
                 frequency_dict.update({
                     column_name: {
                         0: (len(data.loc[(data[column_name] == 0) & (data['Class_4'] == class_name)]) +
-                            (self.m * self.p)) /
-                           (class_normalizer + self.m),
+                            (m * p)) /
+                           (class_normalizer + m),
                         1: (len(data.loc[(data[column_name] == 1) & (data['Class_4'] == class_name)]) +
-                            (self.m * self.p)) /
-                           (class_normalizer + self.m)
+                            (m * p)) /
+                           (class_normalizer + m)
                     }
                 })
 
@@ -78,3 +90,70 @@ class NaiveBayes:
         accuracy = (true_positive + true_negative) / len(data)
 
         return accuracy
+
+    def tune(self):
+        """
+        Tune function
+
+        This function uses the fit function targeted at the tune data split. It loops through a predefined list of theta
+            and alpha in order to determine the highest accuracy score.
+        """
+        # Theta and alpha ranges. Theta starts at .5 and goes up by .5 to 10. Alpha start at 2 and goes up by 1 to 6
+        p_list = np.linspace(.0005, .003, 6)
+        m_list = np.linspace(.5, 3, 5)
+
+        # Variables for remembering the optimal theta and alpha
+        max_accuracy = 0
+        optimal_p = .001
+        optimal_m = 1
+
+        # Go through each theta and alpha (similar to a grid search)
+        for p in p_list:
+            for m in m_list:
+                # Fit and retrieve the accuracy
+                accuracy = self.fit(data_split_name='tune', p=p, m=m)
+
+                # Check for most optimal theta and alpha
+                if accuracy > max_accuracy:
+                    max_accuracy = accuracy
+                    optimal_p = p
+                    optimal_m = m
+
+                # Let's append the result back to the object for visualization later
+                self.tune_parameter_list.append(f'{p}, {m}')
+                self.tune_accuracy_list.append(accuracy)
+
+        # After the loops are done, we'll set the model's theta and alpha
+        self.p = optimal_p
+        self.m = optimal_m
+
+    def visualize_tune(self):
+        """
+        Tune visualization function
+
+        This function uses the results of the tune function to create a plot graph
+
+        :return: matplotlib saved jpg in output folder
+        """
+        # Figure / axis set up
+        fig, ax = plt.subplots()
+
+        # We'll plot the list of params and their accuracy
+        ax.plot(self.tune_parameter_list, self.tune_accuracy_list, 'o')
+
+        # Title
+        ax.set_title(rf'{self.data_name} Tune Results - Optimal: p {self.p}, p {self.m}')
+
+        # X axis
+        ax.set_xlabel(r'Parameters - Major Ticks: p, Minor Ticks: m')
+        ax.set_xlim(5, 30)
+        ax.set_xticks(np.linspace(0, 25, 6))
+        ax.set_xticklabels(np.linspace(.0005, .003, 6), rotation=45, fontsize=6)
+        ax.minorticks_on()
+
+        # Y axis
+        ax.set_ylabel('Accuracy')
+        ax.tick_params(axis='y', which='minor', bottom=False)
+
+        # Saving
+        plt.savefig(f'output\\naive_bayes_{self.data_name}_tune.jpg')

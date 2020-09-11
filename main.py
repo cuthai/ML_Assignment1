@@ -43,7 +43,9 @@ def main():
 
     naive_bayes = NaiveBayes(etl)
 
-    naive_bayes.fit()
+    naive_bayes.tune()
+
+    naive_bayes.visualize_tune()
 
 
 if __name__ == '__main__':
