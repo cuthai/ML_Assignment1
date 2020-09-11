@@ -75,7 +75,7 @@ class NaiveBayes:
                     }
                 })
 
-            self.variable_frequency.update({int(class_name): frequency_dict})
+            self.variable_frequency.update({class_name: frequency_dict})
 
     def classify(self, data_split_name):
         data = self.data_split[data_split_name]

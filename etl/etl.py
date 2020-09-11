@@ -27,10 +27,14 @@ class ETL:
         self.data = None
         self.transformed_data = None
         self.data_split = {}
-        self.class_data_split = {}
+
         self.data_name = data_name
         self.random_state = random_state
         self.classes = 0
+
+        # Naive Bayes needs a singular class column which we will save here for
+        self.class_column = None
+        self.class_data_split = {}
 
         # Extract
         self.extract()
@@ -137,6 +141,9 @@ class ETL:
         # We don't need ID so let's drop that
         temp_df.drop(columns='ID', inplace=True)
 
+        # Save class column for Naive Bayes
+        self.class_column = temp_df['Class']
+
         # Get dummies of the binned data
         temp_df = pd.get_dummies(temp_df, columns=['Clump_Thickness', 'Uniformity_Cell_Size', 'Uniformity_Cell_Shape',
                                                    'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 'Bare_Nuclei',
@@ -144,6 +151,7 @@ class ETL:
 
         # Reset the index since dropping some of the data points will mess with the index
         temp_df.reset_index(inplace=True, drop=True)
+        self.class_column.reset_index(inplace=True, drop=True)
 
         # We only need one target variable, the other can be dropped
         temp_df.drop(columns='Class_2', inplace=True)
@@ -169,6 +177,9 @@ class ETL:
         # We don't need ID so let's drop that
         temp_df.drop(columns='ID', inplace=True)
 
+        # Save class column for Naive Bayes
+        self.class_column = temp_df['Class']
+
         # Bin numerical values
         for column in ['Refractive_Index', 'Sodium', 'Magnesium', 'Aluminum', 'Silicon', 'Potassium', 'Calcium',
                        'Barium', 'Iron']:
@@ -180,6 +191,7 @@ class ETL:
 
         # Index clean up
         temp_df.reset_index(inplace=True, drop=True)
+        self.class_column.reset_index(inplace=True, drop=True)
 
         # Set attributes for ETL object, there are 6 total classes so this is a multi classifier
         self.classes = 6
@@ -203,12 +215,16 @@ class ETL:
         for column in ['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width']:
             temp_df[column] = pd.cut(temp_df[column], bins=10)
 
+        # Save class column for Naive Bayes
+        self.class_column = temp_df['Class']
+
         # Get dummies of the binned data
         temp_df = pd.get_dummies(temp_df, columns=['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width',
                                                    'Class'])
 
         # Index clean up
         temp_df.reset_index(inplace=True, drop=True)
+        self.class_column.reset_index(inplace=True, drop=True)
 
         # Set attributes for ETL object, there are 3 total classes so this is a multi classifier
         self.classes = 3
@@ -228,6 +244,9 @@ class ETL:
         # We'll make a deep copy of our data set
         temp_df = pd.DataFrame.copy(self.data, deep=True)
 
+        # Save class column for Naive Bayes
+        self.class_column = temp_df['Class']
+
         # Get dummies of the binned data
         temp_df = pd.get_dummies(temp_df, columns=['Date', 'Plant_Stand', 'Percip', 'Temp', 'Hail', 'Crop_Hist',
                                                    'Area_Damaged', 'Severity', 'Seed_Tmt', 'Germination',
@@ -239,6 +258,7 @@ class ETL:
                                                    'Seed_Size', 'Shriveling', 'Roots', 'Class'])
         # Index clean up
         temp_df.reset_index(inplace=True, drop=True)
+        self.class_column.reset_index(inplace=True, drop=True)
 
         # Set attributes for ETL object, there are 4 total classes so this is a multi classifier
         self.classes = 4
@@ -258,6 +278,9 @@ class ETL:
         # We'll make a deep copy of our data set
         temp_df = pd.DataFrame.copy(self.data, deep=True)
 
+        # Save class column for Naive Bayes
+        self.class_column = temp_df['Class']
+
         # Get dummies of the binned data
         temp_df = pd.get_dummies(temp_df, columns=['Handicapped_Infants', 'Water_Project_Cost_Sharing',
                                                    'Adoption_Budget_Resolution', 'Physician_Fee_Freeze',
@@ -269,6 +292,7 @@ class ETL:
 
         # Index clean up
         temp_df.reset_index(inplace=True, drop=True)
+        self.class_column.reset_index(inplace=True, drop=True)
 
         # We only need one target variable, the other can be dropped
         temp_df.drop(columns='Class_democrat', inplace=True)
@@ -325,10 +349,12 @@ class ETL:
 
         # Update our attribute with the dictionary defining the train, tune, and test data sets for class column only
         self.class_data_split.update({
-            'train': self.data['Class'].iloc[train_splitter],
-            'tune': self.data['Class'].iloc[tune_splitter],
-            'test': self.data['Class'].iloc[test_splitter]
+            'train': self.class_column.iloc[train_splitter],
+            'tune': self.class_column.iloc[tune_splitter],
+            'test': self.class_column.iloc[test_splitter]
         })
+
+        pass
 
 
     def update_data_name(self, class_name):
