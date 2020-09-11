@@ -49,6 +49,8 @@ def main():
 
         naive_bayes.visualize_tune()
 
+        print(naive_bayes.fit())
+
     pass
 
 
