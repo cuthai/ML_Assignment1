@@ -49,13 +49,11 @@ def main():
 
         naive_bayes.visualize_tune()
 
-        print(naive_bayes.fit())
+        naive_bayes.fit()
 
-        print(naive_bayes.predict())
+        naive_bayes.predict()
 
         naive_bayes.save_csv_results()
-
-    pass
 
 
 if __name__ == '__main__':

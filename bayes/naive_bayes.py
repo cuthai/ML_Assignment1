@@ -38,6 +38,9 @@ class NaiveBayes:
         self.test_accuracy = None
         self.test_results = None
 
+        # Overall Summary
+        self.summary = {}
+
     def update_data_split(self):
         if self.classes == 2:
             class_count = 1
@@ -85,13 +88,10 @@ class NaiveBayes:
         for index, row in data.iterrows():
             class_coefficient = {key: 1 for (key) in self.class_names}
 
-            for column_name in data.keys()[:-1]:
-
-                for class_name in self.class_names:
-                    class_coefficient.update({
-                        class_name: class_coefficient[class_name] *
-                                    self.variable_frequency[class_name][column_name][row[column_name]]
-                    })
+            for class_name in self.class_names:
+                for column_name in data.keys()[:-1]:
+                    class_coefficient[class_name] = class_coefficient[class_name] *\
+                                                    self.variable_frequency[class_name][column_name][row[column_name]]
 
             classification = max(class_coefficient, key=class_coefficient.get)
             classification_list.append(classification)
@@ -132,8 +132,8 @@ class NaiveBayes:
             and alpha in order to determine the highest accuracy score.
         """
         # Theta and alpha ranges. Theta starts at .5 and goes up by .5 to 10. Alpha start at 2 and goes up by 1 to 6
-        p_list = np.linspace(.0002, .002, 10)
-        m_list = np.linspace(.25, 2, 8)
+        p_list = np.linspace(.0002, .001, 5)
+        m_list = np.linspace(.25, 1, 4)
 
         # Variables for remembering the optimal theta and alpha
         max_accuracy = 0
@@ -178,10 +178,10 @@ class NaiveBayes:
         ax.set_title(rf'{self.data_name} Tune Results - Optimal: p {self.p}, m {self.m}')
 
         # X axis
-        p_list = np.linspace(.0002, .002, 10)
+        p_list = np.linspace(.0002, .001, 5)
         ax.set_xlabel(r'Parameters - Major Ticks: p, Minor Ticks: m')
-        ax.set_xlim(5, 80)
-        ax.set_xticks(np.linspace(0, 75, 10))
+        ax.set_xlim(4, 20)
+        ax.set_xticks(np.linspace(0, 16, 5))
         ax.set_xticklabels(p_list, rotation=45, fontsize=6)
         ax.minorticks_on()
 
@@ -190,7 +190,7 @@ class NaiveBayes:
         ax.tick_params(axis='y', which='minor', bottom=False)
 
         # Saving
-        plt.savefig(f'naive_bayes_output\\naive_bayes_{self.data_name}_tune.jpg')
+        plt.savefig(f'output_{self.data_name}\\bayes_{self.data_name}_tune.jpg')
 
     def predict(self, data_split_name='test'):
         results = self.classify(data_split_name)
@@ -199,6 +199,33 @@ class NaiveBayes:
         self.test_results = results[1]
 
         return results[0]
+
+    def create_and_save_summary(self):
+        """
+        Function to create a summary
+
+        Creates a JSON summary for this object and outputs a JSON document to the output folder
+
+        :return: JSON to output folder
+        """
+        # Set up the summary dictionary with tune, train, and test results
+        self.summary = {
+            'name': self.data_name,
+            'tune': {
+                'p': self.p,
+                'm': self.m,
+            },
+            'train': {
+                'accuracy': self.train_accuracy
+            },
+            'test': {
+                'accuracy': self.test_accuracy
+            }
+        }
+
+        # Saving
+        with open(f'output_{self.data_name}\\bayes_{self.data_name}_summary.json', 'w') as file:
+            json.dump(self.summary, file)
 
     def save_csv_results(self):
         """
@@ -209,7 +236,7 @@ class NaiveBayes:
         :return: csv to output folder
         """
         # Train
-        self.train_results.to_csv(f'naive_bayes_output\\{self.data_name}_train_results.csv')
+        self.train_results.to_csv(f'output_{self.data_name}\\bayes_{self.data_name}_train_results.csv')
 
         # Test
-        self.test_results.to_csv(f'naive_bayes_output\\{self.data_name}_test_results.csv')
+        self.test_results.to_csv(f'output_{self.data_name}\\bayes_{self.data_name}_test_results.csv')
