@@ -23,12 +23,14 @@ class ETL:
             vote
         :param random_state: int, seed for data split
         """
-        # Set the starting attributes and data_name
+        # Set the attributes to hold our data
         self.data = None
         self.transformed_data = None
         self.data_split = {}
 
+        # Meta attributes
         self.data_name = data_name
+        self.original_data_name = data_name
         self.random_state = random_state
         self.classes = 0
 

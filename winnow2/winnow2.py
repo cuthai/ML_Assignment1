@@ -24,6 +24,7 @@ class Winnow2:
         self.etl = etl
         self.data = self.etl.data
         self.data_name = self.etl.data_name
+        self.original_data_name = self.etl.original_data_name
         self.data_split = self.etl.data_split
 
         # Winnow2 Params
@@ -76,7 +77,7 @@ class Winnow2:
         x = data.iloc[:, :-1]
         y = data.iloc[:, -1]
         y_name = data.keys()[-1]
-        self.weights = [1] * len(x.keys())
+        self.weights = np.ones(len(x.keys()))
 
         # Accuracy variables
         true_positive = 0
@@ -91,17 +92,17 @@ class Winnow2:
             # Classification coefficient calculated using x * weights to compare to theta
             classification_coefficient = 0
 
-            # List to hold which weights will be promoted or demoted (if = 1)
-            weights_to_change = []
+            # Array to hold which weights will be promoted or demoted (if = 1)
+            weights_to_change = np.ones(len(row))
 
             # Now to go through each column of the row
             for column_index in range(len(row)):
                 # Add weight * x to the current coefficient
                 classification_coefficient += row[column_index] * self.weights[column_index]
 
-                # If there was something to multiply we'll add it to weights_to_change
+                # If x = 1 we'll change the value at index of weights_to_change from 1 to alpha
                 if row[column_index] == 1:
-                    weights_to_change.append(column_index)
+                    weights_to_change[column_index] = alpha
 
             # After row is finished, compare the coefficient to theta to assign to class
             if classification_coefficient > theta:
@@ -109,7 +110,7 @@ class Winnow2:
 
                 # If we have a false positive, we need to trigger a demotion on the weights_to_change
                 if prediction != y[row_index]:
-                    self.demotion(weights_to_change, alpha)
+                    self.demotion(weights_to_change)
 
                 # Other we have a true positive so let's give that to accuracy
                 else:
@@ -121,7 +122,7 @@ class Winnow2:
 
                 # If we have a false negative, we need to trigger a promotion on the weights_to_change
                 if prediction != y[row_index]:
-                    self.promotion(weights_to_change, alpha)
+                    self.promotion(weights_to_change)
 
                 # Other we have a true negative so let's give that to accuracy
                 else:
@@ -147,29 +148,21 @@ class Winnow2:
 
         return classification_coefficient_list, prediction_list, accuracy
 
-    def demotion(self, weights_to_change, alpha):
+    def demotion(self, weights_to_change):
         """
         Demotion function
 
-        :param weights_to_change: list, which weights need to be demoted
-        :param alpha: int, amount to divide the weight by
+        :param weights_to_change: array, each index has 1 if no change, alpha if change
         """
-        # Go through the index of each of the weights_to_change to update
-        for weight in weights_to_change:
-            # We'll update the object weights itself to give this back to the fit function to continue
-            self.weights[weight] = self.weights[weight] / alpha
+        self.weights = self.weights / weights_to_change
 
-    def promotion(self, weights_to_change, alpha):
+    def promotion(self, weights_to_change):
         """
         Promotion function
 
-        :param weights_to_change: list, which weights need to be promoted
-        :param alpha: int, amount to multiply the weight by
+        :param weights_to_change: array, each index has 1 if no change, alpha if change
         """
-        # Go through the index of each of the weights_to_change to update
-        for weight in weights_to_change:
-            # We'll update the object weights itself to give this back to the fit function to continue
-            self.weights[weight] = self.weights[weight] * alpha
+        self.weights = self.weights * weights_to_change
 
     def tune(self):
         """
@@ -305,7 +298,7 @@ class Winnow2:
         ax.tick_params(axis='y', which='minor', bottom=False)
 
         # Saving
-        plt.savefig(f'output\\{self.data_name}_tune.jpg')
+        plt.savefig(f'output_{self.original_data_name}\\winnow_{self.data_name}_tune.jpg')
 
     def create_and_save_summary(self):
         """
@@ -331,7 +324,7 @@ class Winnow2:
         }
 
         # Saving
-        with open(f'output\\{self.data_name}_summary.json', 'w') as file:
+        with open(f'output_{self.original_data_name}\\winnow_{self.data_name}_summary.json', 'w') as file:
             json.dump(self.summary, file)
 
     def save_csv_results(self):
@@ -343,7 +336,7 @@ class Winnow2:
         :return: csv to output folder
         """
         # Train
-        self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')
+        self.train_results.to_csv(f'output_{self.original_data_name}\\winnow_{self.data_name}_train_results.csv')
 
         # Test
-        self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
+        self.test_results.to_csv(f'output_{self.original_data_name}\\winnow_{self.data_name}_test_results.csv')

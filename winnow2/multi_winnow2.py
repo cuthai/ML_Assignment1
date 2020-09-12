@@ -109,6 +109,10 @@ class MultiWinnow2:
             # Retrieve the test classification coefficients to add to the classification_coefficient_df
             self.test_classification_coefficient_df[class_name] = test_results[0]
 
+            # Let's also save the csv results and summary of the individual class
+            temp_winnow2_model.create_and_save_summary()
+            temp_winnow2_model.save_csv_results()
+
     def multi_class_winnow2(self):
         """
         Function to determine highest scoring class
@@ -167,10 +171,12 @@ class MultiWinnow2:
         :return: JSON to output folder
         """
         # Overall Accuracy calculation
-        train_accuracy = len(self.train_results.loc[self.train_results['Class'] == self.train_results['Prediction']]) /\
-                         len(self.train_results)
-        test_accuracy = len(self.test_results.loc[self.test_results['Class'] == self.test_results['Prediction']]) /\
-                        len(self.test_results)
+        train_accuracy = len(
+            self.train_results.loc[
+                self.train_results['Class'] == self.train_results['Prediction']]) / len(self.train_results)
+        test_accuracy = len(
+            self.test_results.loc[
+                self.test_results['Class'] == self.test_results['Prediction']]) / len(self.test_results)
 
         # Overall
         self.summary.update({
@@ -200,7 +206,7 @@ class MultiWinnow2:
             self.summary.update(summary)
 
         # Saving
-        with open(f'output\\{self.data_name}_summary.json', 'w') as file:
+        with open(f'output_{self.data_name}\\winnow_{self.data_name}_summary.json', 'w') as file:
             json.dump(self.summary, file)
 
     def save_csv_results(self):
@@ -212,7 +218,7 @@ class MultiWinnow2:
         :return: csv to output folder
         """
         # Train
-        self.train_results.to_csv(f'output\\{self.data_name}_train_results.csv')
+        self.train_results.to_csv(f'output_{self.data_name}\\winnow_{self.data_name}_train_results.csv')
 
         # Test
-        self.test_results.to_csv(f'output\\{self.data_name}_test_results.csv')
+        self.test_results.to_csv(f'output_{self.data_name}\\winnow_{self.data_name}_test_results.csv')
