@@ -354,9 +354,6 @@ class ETL:
             'test': self.class_column.iloc[test_splitter]
         })
 
-        pass
-
-
     def update_data_name(self, class_name):
         """
         Helper function for multi class

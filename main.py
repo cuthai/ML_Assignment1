@@ -51,6 +51,10 @@ def main():
 
         print(naive_bayes.fit())
 
+        print(naive_bayes.predict())
+
+        naive_bayes.save_csv_results()
+
     pass
 
 

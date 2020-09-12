@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 
@@ -29,6 +30,14 @@ class NaiveBayes:
         self.tune_parameter_list = []
         self.tune_accuracy_list = []
 
+        # Train Results
+        self.train_accuracy = None
+        self.train_results = None
+
+        # Test Results
+        self.test_accuracy = None
+        self.test_results = None
+
     def update_data_split(self):
         if self.classes == 2:
             class_count = 1
@@ -39,20 +48,9 @@ class NaiveBayes:
             self.data_split[key] = self.data_split[key].iloc[:, :-class_count]
             self.data_split[key]['Class'] = self.etl.class_data_split[key]
 
-    def fit(self, data_split_name='test', p=None, m=None):
+    def construct_frequency_tree(self, data_split_name, p, m):
         self.variable_frequency = {}
 
-        # If no parameters grab the object's current theta and alpha
-        if p == None:
-            p = self.p
-        if m == None:
-            m = self.m
-
-        self.construct_frequency_tree(data_split_name, p=p, m=m)
-
-        return self.classify(data_split_name)
-
-    def construct_frequency_tree(self, data_split_name, p, m):
         data = self.data_split[data_split_name]
         overall_normalizer = len(data)
 
@@ -92,7 +90,7 @@ class NaiveBayes:
                 for class_name in self.class_names:
                     class_coefficient.update({
                         class_name: class_coefficient[class_name] *
-                        self.variable_frequency[class_name][column_name][row[column_name]]
+                                    self.variable_frequency[class_name][column_name][row[column_name]]
                     })
 
             classification = max(class_coefficient, key=class_coefficient.get)
@@ -103,7 +101,28 @@ class NaiveBayes:
 
         accuracy = (true_positive + true_negative) / len(data)
 
-        return accuracy
+        # Let's also go back to the original untransformed data set and attach our predictions there
+        train_result_df = pd.DataFrame(self.data, index=data.index)  # TODO this is broken for breast-cancer
+        train_result_df['prediction'] = classification_list
+
+        return accuracy, train_result_df
+
+    def fit(self, data_split_name='train', p=None, m=None):
+        # If no parameters grab the object's current theta and alpha
+        if p == None:
+            p = self.p
+        if m == None:
+            m = self.m
+
+        self.construct_frequency_tree(data_split_name, p=p, m=m)
+
+        results = self.classify(data_split_name)
+
+        if data_split_name == 'train':
+            self.train_accuracy = results[0]
+            self.train_results = results[1]
+
+        return results[0]
 
     def tune(self):
         """
@@ -172,3 +191,25 @@ class NaiveBayes:
 
         # Saving
         plt.savefig(f'naive_bayes_output\\naive_bayes_{self.data_name}_tune.jpg')
+
+    def predict(self, data_split_name='test'):
+        results = self.classify(data_split_name)
+
+        self.test_accuracy = results[0]
+        self.test_results = results[1]
+
+        return results[0]
+
+    def save_csv_results(self):
+        """
+        Function to output a csv of the results
+
+        This uses the split of the original data set as output
+
+        :return: csv to output folder
+        """
+        # Train
+        self.train_results.to_csv(f'naive_bayes_output\\{self.data_name}_train_results.csv')
+
+        # Test
+        self.test_results.to_csv(f'naive_bayes_output\\{self.data_name}_test_results.csv')
