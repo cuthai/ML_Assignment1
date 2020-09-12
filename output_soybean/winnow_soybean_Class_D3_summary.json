@@ -1,0 +1,1 @@
+{"name": "soybean_Class_D3", "tune": {"theta": 3.5, "alpha": 5.0}, "train": {"accuracy": 0.84375}, "test": {"accuracy": 1.0}}
