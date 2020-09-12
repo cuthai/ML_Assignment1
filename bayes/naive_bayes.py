@@ -162,7 +162,7 @@ class NaiveBayes:
         accuracy = true_positive / len(data)
 
         # Let's also go back to the original untransformed data set and attach our predictions there
-        train_result_df = pd.DataFrame(self.data, index=data.index)  # TODO this is broken for breast-cancer
+        train_result_df = pd.DataFrame(self.data, index=data.index)
         train_result_df['prediction'] = classification_list
 
         return accuracy, train_result_df
@@ -264,7 +264,7 @@ class NaiveBayes:
         ax.tick_params(axis='y', which='minor', bottom=False)
 
         # Saving
-        plt.savefig(f'output_{self.data_name}\\bayes_{self.data_name}_tune.jpg')
+        plt.savefig(f'output_{self.data_name}\\bayes_{self.data_name}_tune.jpg' )
 
     def predict(self, data_split_name='test'):
         """

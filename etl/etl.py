@@ -134,11 +134,12 @@ class ETL:
         :return self.transformed_data: DataFrame, transformed data set
         :return self.classes: int, num of classes
         """
+        # Remove missing data points
+        self.data = self.data.loc[self.data['Bare_Nuclei'] != '?']
+        self.data.reset_index(inplace=True, drop=True)
+
         # We'll make a deep copy of our data set
         temp_df = pd.DataFrame.copy(self.data, deep=True)
-
-        # Remove missing data points
-        temp_df = temp_df.loc[temp_df['Bare_Nuclei'] != '?']
 
         # We don't need ID so let's drop that
         temp_df.drop(columns='ID', inplace=True)
