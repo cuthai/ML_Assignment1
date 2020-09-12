@@ -6,7 +6,7 @@ import json
 
 class Winnow2:
     """
-    Class Winnow2 to handle classification of the a single class of the data
+    Class Winnow2 to handle classification of a single class of the data
 
     This class implements a fit, predict, and tune function for the Winnow2 function. The fit additionally uses a
         promotion and demotion function to handle the outcome of a classification. There are additional functions to
