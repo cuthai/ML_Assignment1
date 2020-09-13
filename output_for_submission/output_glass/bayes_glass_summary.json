@@ -1,0 +1,1 @@
+{"name": "glass", "tune": {"p": 0.0002, "m": 0.25}, "train": {"accuracy": 0.8203125}, "test": {"accuracy": 0.5384615384615384}}

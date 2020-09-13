@@ -1,0 +1,1 @@
+{"name": "iris_Class_Iris-versicolor", "tune": {"theta": 5.0, "alpha": 2.0}, "train": {"accuracy": 0.8888888888888888}, "test": {"accuracy": 0.9111111111111111}}

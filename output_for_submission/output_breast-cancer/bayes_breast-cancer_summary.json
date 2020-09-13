@@ -1,0 +1,1 @@
+{"name": "breast-cancer", "tune": {"p": 0.0002, "m": 0.25}, "train": {"accuracy": 0.980440097799511}, "test": {"accuracy": 0.970873786407767}}

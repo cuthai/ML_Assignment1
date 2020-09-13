@@ -1,0 +1,1 @@
+{"name": "soybean", "tune": {"p": 0.0002, "m": 0.25}, "train": {"accuracy": 1.0}, "test": {"accuracy": 1.0}}
